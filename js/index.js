@@ -1,14 +1,32 @@
+function validateEntry(str){
+	if(str.length == 0){return false}
+	else{ return true};
+};
+
+function alertMessage(str){
+	let alertBox = document.getElementById("alertBox");
+	alertBox.innerText = str;
+	alertBox.hidden = false;
+}
+
 document.addEventListener("DOMContentLoaded", function(){
-    document.getElementById("autos").addEventListener("click", function() {
-        localStorage.setItem("catID", 101);
-        window.location = "products.html"
-    });
-    document.getElementById("juguetes").addEventListener("click", function() {
-        localStorage.setItem("catID", 102);
-        window.location = "products.html"
-    });
-    document.getElementById("muebles").addEventListener("click", function() {
-        localStorage.setItem("catID", 103);
-        window.location = "products.html"
-    });
+	let formElement = document.getElementById("formLogin");
+
+	formElement.addEventListener("submit", event =>{
+		let str_alert = "";
+		let invalid = false;
+		if(!validateEntry(event.target[0].value)){
+			str_alert += "\nIngresar Email";
+			invalid = true;
+		}
+		if(!validateEntry(event.target[1].value)){
+			str_alert += "\nIngresar Contraseña";
+			invalid = true;
+		}
+
+		if(invalid == true){
+			alertMessage(str_alert);
+			event.preventDefault();
+		};
+	});
 });

@@ -164,6 +164,17 @@ footer p {
   margin: auto;
 }
 
+.signin-logo {
+	width: 100%;
+	max-width: 800px;
+	padding: 15px;
+	margin: auto;
+  }
+
+#signin-alert {
+	
+}
+
 #spinner-wrapper {
   position: fixed;
   background-color: rgba(0, 0, 0, 0.5);
