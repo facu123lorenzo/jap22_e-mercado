@@ -9,6 +9,10 @@ function alertMessage(str){
 	alertBox.hidden = false;
 }
 
+window.handleGISResponse = (response)=>{
+	window.location.href = "main.html";
+}
+
 document.addEventListener("DOMContentLoaded", function(){
 	let formElement = document.getElementById("formLogin");
 
