@@ -32,5 +32,7 @@ document.addEventListener("DOMContentLoaded", function(){
 			alertMessage(str_alert);
 			event.preventDefault();
 		};
+		
+		localStorage.setItem('loggedEmail', event.target[0].value);
 	});
 });

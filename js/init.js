@@ -7,6 +7,13 @@ const CART_INFO_URL = "https://japceibal.github.io/emercado-api/user_cart/";
 const CART_BUY_URL = "https://japceibal.github.io/emercado-api/cart/buy.json";
 const EXT_TYPE = ".json";
 
+const ORDER_ASC_BY_NAME = "AZ";
+const ORDER_DESC_BY_NAME = "ZA";
+const ORDER_ASC_BY_COST = "CostAsc.";
+const ORDER_DESC_BY_COST = "CostDesc.";
+const ORDER_BY_PROD_COUNT = "Cant.";
+const ORDER_BY_SOLD_COUNT = "Sold.";
+
 let showSpinner = function(){
   document.getElementById("spinner-wrapper").style.display = "block";
 }
