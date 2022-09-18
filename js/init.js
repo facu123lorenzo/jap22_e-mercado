@@ -46,3 +46,11 @@ let getJSONData = function(url){
         return result;
     });
 }
+
+function formatCurrency(cost, currency){
+	if(currency == 'USD'){
+		return Number(cost).toLocaleString('en');
+	}else{
+		return Number(cost).toLocaleString('uy');
+	}
+}

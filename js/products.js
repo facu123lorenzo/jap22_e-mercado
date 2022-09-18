@@ -41,6 +41,11 @@ function sortProducts(criteria, array){
     return result;
 }
 
+function setProdID(id) {
+    localStorage.setItem("prodID", id);
+    window.location = "product-info.html"
+}
+
 function showProductsList(){
 	let htmlContentToAppend = "";
 
@@ -52,14 +57,14 @@ function showProductsList(){
 			((searchText == "") || (product.name.toLowerCase().includes(searchText) || product.description.toLowerCase().includes(searchText)))
 			){
 			htmlContentToAppend += `
-				<div class="list-group-item list-group-item-action cursor-active">
+				<div onclick="setProdID(${product.id})" class="list-group-item list-group-item-action cursor-active">
 					<div class="row">
 						<div class="col-3">
 							<img src="${product.image}" alt="${product.description}" class="img-thumbnail">
 						</div>
 						<div class="col">
 							<div class="d-flex w-100 justify-content-between">
-								<h4 class="mb-1">${product.name} - ${product.currency} ${product.cost}</h4>
+								<h4 class="mb-1">${product.name} - ${product.currency} ${formatCurrency(product.cost, product.currency)}</h4>
 								<small class="text-muted">${product.soldCount} vendidos</small>
 							</div>
 							<p class="mb-1">${product.description}</p>
@@ -131,8 +136,6 @@ document.addEventListener("DOMContentLoaded", function(){
     });
 
     document.getElementById("rangeFilterCount").addEventListener("click", function(){
-        //Obtengo el mínimo y máximo de los intervalos para filtrar por cantidad
-        //de productos por categoría.
         minCount = document.getElementById("rangeFilterCountMin").value;
         maxCount = document.getElementById("rangeFilterCountMax").value;
 
@@ -159,9 +162,5 @@ document.addEventListener("DOMContentLoaded", function(){
 
 		searchText = e.srcElement.value.toLowerCase();
 		showProductsList();
-		/* currentProductsArray.filter(prod => {
-			//console.log(prod.name.match(inputStr));
-			if(prod.name.match(inputStr) != null){console.log("true")}
-		}); */
 	});
 });
