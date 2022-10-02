@@ -136,8 +136,8 @@ function createProductCard(product, style){
 	}
 	else{
 		let carouselImages = "";
+		let active = "";
 		for(let i=0; i<product.images.length; i++){
-			let active = ""
 			active = i==0 ? "active":"";
 			carouselImages += `
 				<div class="carousel-item ${active}">

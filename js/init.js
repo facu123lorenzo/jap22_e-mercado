@@ -54,3 +54,8 @@ function formatCurrency(cost, currency){
 		return Number(cost).toLocaleString('uy');
 	}
 }
+
+function logout(){
+	window.location = "./index.html";
+	localStorage.removeItem("loggedEmail");
+}
