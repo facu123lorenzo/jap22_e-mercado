@@ -64,7 +64,7 @@ function showProductsList(){
 						</div>
 						<div class="col">
 							<div class="d-flex w-100 justify-content-between">
-								<h4 class="mb-1">${product.name} - ${product.currency} ${formatCurrency(product.cost, product.currency)}</h4>
+								<h4 class="mb-1">${product.name} - ${formatCurrency(product.cost, product.currency)}</h4>
 								<small class="text-muted">${product.soldCount} vendidos</small>
 							</div>
 							<p class="mb-1">${product.description}</p>
@@ -157,10 +157,8 @@ document.addEventListener("DOMContentLoaded", function(){
     });
 
 	document.getElementById("productSearchBar").addEventListener("input", e =>{
-		//console.log(e.srcElement.value);
-		let inputStr = e.srcElement.value;
-
-		searchText = e.srcElement.value.toLowerCase();
+		let inputStr = e.target.value;
+		searchText = e.target.value.toLowerCase();
 		showProductsList();
 	});
 });

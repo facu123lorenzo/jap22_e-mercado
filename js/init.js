@@ -7,6 +7,8 @@ const CART_INFO_URL = "https://japceibal.github.io/emercado-api/user_cart/";
 const CART_BUY_URL = "https://japceibal.github.io/emercado-api/cart/buy.json";
 const EXT_TYPE = ".json";
 
+const BROUEXCHANGE_URL = "https://cotizaciones-brou.herokuapp.com/api/currency/latest";
+
 const ORDER_ASC_BY_NAME = "AZ";
 const ORDER_DESC_BY_NAME = "ZA";
 const ORDER_ASC_BY_COST = "CostAsc.";
@@ -22,7 +24,7 @@ let hideSpinner = function(){
   document.getElementById("spinner-wrapper").style.display = "none";
 }
 
-let getJSONData = function(url){
+let getJSONData = async function(url){
     let result = {};
     showSpinner();
     return fetch(url)
@@ -48,14 +50,62 @@ let getJSONData = function(url){
 }
 
 function formatCurrency(cost, currency){
+	let str = currency+" ";
 	if(currency == 'USD'){
-		return Number(cost).toLocaleString('en');
+		str += Number(cost).toLocaleString('en');
 	}else{
-		return Number(cost).toLocaleString('uy');
+		str += Number(cost).toLocaleString('uy');
 	}
+	return str;
+}
+
+/**
+* Load the predefined product into the local
+* cart if not already present.
+*/
+ async function fetchUserCart(){
+	fetch(CART_INFO_URL+"25801.json").then(res => res.json())
+	.then(json =>{
+		let username = localStorage.getItem("loggedEmail");
+
+		let localArticles = getCart(username);
+		if(!localArticles || localArticles.length <= 0){
+			// Local cart is empty, just save this article and skip verifications
+			setCart(username, json.articles);
+			return;
+		}
+
+		// Skip when the fetched article is already in the storage
+		let article = null;
+		article = localArticles.find(function(art){
+			return art.id == json.articles[0].id;
+		});
+		if(article){
+			return;
+		}
+
+		// Save the article in the local cart
+		localArticles.push(json.articles[0]);
+		setCart(username, localArticles);
+	})
+	.catch(error => console.log(error));
+}
+
+async function login(username){
+	localStorage.setItem("loggedEmail", username);
+	await fetchUserCart();
+	window.location.href = "./main.html";
 }
 
 function logout(){
-	window.location = "./index.html";
+	window.location.href = "./index.html";
 	localStorage.removeItem("loggedEmail");
+}
+
+function getCart(username){
+	return JSON.parse(localStorage.getItem("cart-"+username));
+}
+
+function setCart(username, productsJSON){
+	localStorage.setItem("cart-"+username, JSON.stringify(productsJSON));
 }

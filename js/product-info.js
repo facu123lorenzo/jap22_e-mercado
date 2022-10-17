@@ -1,3 +1,4 @@
+let currentProduct = null;
 let productScore = 0;
 let productComments = [];
 let commentRate = 0;
@@ -6,6 +7,32 @@ const cardStyle = {
 	CARD_RELATED:	0,
 	CARD_BUY:		1,
 };
+
+function addToCart(){
+	if(!currentProduct) return;
+
+	let username = localStorage.getItem("loggedEmail");
+	let cart = getCart(username);
+	if(!cart){cart = []}
+	let index = cart.findIndex(function(art){
+		return art.id == currentProduct.id;
+	})
+	if(index < 0){
+		let product = {
+			id: currentProduct.id,
+			name: currentProduct.name,
+			count: 1,
+			unitCost: currentProduct.cost,
+			currency: currentProduct.currency,
+			image: currentProduct.images[0]
+		};
+		cart.push(product);
+	}else{ // If there's already a product just increase the count
+		cart[index].count++;
+	}
+
+	setCart(username, cart);
+}
 
 function setProdID(id) {
     localStorage.setItem("prodID", id);
@@ -120,7 +147,7 @@ function createProductCard(product, style){
 				<h1 class="">${product.name}</h1>
 				<div class="px-5 row ">
 					<div class="col">
-						<h3 class="text-muted">${product.currency+" "+formatCurrency(product.cost, product.currency)}</h3>
+						<h3 class="text-muted">${formatCurrency(product.cost, product.currency)}</h3>
 					</div>
 				</div>
 			</div>
@@ -169,10 +196,10 @@ function createProductCard(product, style){
 				<p class="py-2 pb-5">${product.description}</p>
 				<div class="px-5 row text-end ">
 					<div class="col">
-						<h3 class="text-muted">${product.currency+" "+formatCurrency(product.cost, product.currency)}</h3>
+						<h3 class="text-muted">${formatCurrency(product.cost, product.currency)}</h3>
 						<p>${product.soldCount} vendidos</p>
 					</div>
-					<button class="d-inline-block btn btn-primary w-auto h-100 p-4 mx-4 ">
+					<button class="d-inline-block btn btn-primary w-auto h-100 p-4 mx-4" onclick="addToCart()">
 						<i class="fa fa-lg fa-shopping-cart m-1"></i>	
 						Añadir al carrito
 					</button>							
@@ -195,7 +222,7 @@ function createProductCard(product, style){
 document.addEventListener("DOMContentLoaded", e => {
 	getJSONData(PRODUCT_INFO_URL + localStorage.getItem("prodID") + ".json").then(result =>{
 		if (result.status === "ok"){
-			let product = result.data;
+			currentProduct = result.data;
 			// Get product comments
 			getJSONData(PRODUCT_INFO_COMMENTS_URL+localStorage.getItem("prodID")+".json").then(result =>{
 				if(result.status === "ok"){
@@ -204,7 +231,7 @@ document.addEventListener("DOMContentLoaded", e => {
 					document.getElementById("comments-section").innerHTML = createCommentsSection();
 					
 					// Called after comments because we need product score to be calculated first
-					document.getElementById("product-section").innerHTML += createProductCard(product, cardStyle.CARD_BUY);
+					document.getElementById("product-section").innerHTML += createProductCard(currentProduct, cardStyle.CARD_BUY);
 				}
 			});
 

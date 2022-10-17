@@ -10,13 +10,14 @@ function alertMessage(str){
 }
 
 window.handleGISResponse = (response)=>{
-	window.location.href = "main.html";
+	login("defaultUser");
 }
 
-document.addEventListener("DOMContentLoaded", function(){
+document.addEventListener("DOMContentLoaded", () =>{
 	let formElement = document.getElementById("formLogin");
 
 	formElement.addEventListener("submit", event =>{
+		event.preventDefault();
 		let str_alert = "";
 		let invalid = false;
 		if(!validateEntry(event.target[0].value)){
@@ -30,9 +31,8 @@ document.addEventListener("DOMContentLoaded", function(){
 
 		if(invalid == true){
 			alertMessage(str_alert);
-			event.preventDefault();
-		};
-		
-		localStorage.setItem('loggedEmail', event.target[0].value);
+			return;
+		}
+		login(event.target[0].value);
 	});
 });
