@@ -15,8 +15,110 @@
 
 <body>
   <main>
-    <div class="container">
-		<div id="cart-section">
+    <div id="checkout-page" class="container">
+		<div class="container h-100 py-5">
+			<div class="row d-flex justify-content-center align-items-center h-100">
+				<div class="col-10">
+					<div class="d-flex justify-content-between align-items-center mb-4">
+						<h3 class="fw-normal mb-0 w-100 text-black text-center">Tu carrito</h3>
+					</div>
+					<div id="cart-section">
+						<!-- From JS -->
+					</div>
+					<div class="d-flex justify-content-between align-items-center mb-4">
+						<h3 class="fw-normal mb-0 w-100 text-black text-center">Datos de envío</h3>
+					</div>
+					<div class="card mb-4">
+						<div class="card-body p-4">
+							
+							<!-- Form -->
+							<form id="cart-form" class="" action="#">
+								
+								<!-- Shipping Information -->
+								<div class="form-outline">
+									<h4>Tipo de envío</h4>
+										<label class="form-label"><input class="mx-2" type="radio" name="shipping" data-value="0.15">Premium 2 a 5 días (15%)</label><br>
+										<label class="form-label"><input class="mx-2" type="radio" name="shipping" data-value="0.07">Express 5 a 8 días (7%)</label><br>
+										<label class="form-label"><input class="mx-2" type="radio" name="shipping" data-value="0.05" checked>Standard 12 a 15 días (5%)</label><br>
+								</div>
+								<div class="form-outline row needs-validation">
+									<h4>Dirección de envío</h4>
+										<label class="form-label">Calle<br>
+											<input name="address" class="form-control form-control-lg" type="text" required>
+											<div class="invalid-feedback">Ingresa una calle válida</div>
+										</label>
+										<label class="form-label">Número<br>
+											<input name="address" class="form-control form-control-lg" type="text" pattern="[0-9]{1,}" required>
+											<div class="invalid-feedback">Ingresa un número válido</div>
+										</label>
+										<label class="form-label">Esquina<br>
+											<input name="address" class="form-control form-control-lg" type="text" required>
+											<div class="invalid-feedback">Ingresa una esquina válida</div>
+										</label>
+									<div class="text-end mt-4">
+										<h4>Resumen</h4>
+										<p id="cart-subtotal"></p> <!-- From JS -->
+										<p id="cart-shipping-cost"></p> <!-- From JS -->
+										<hr>
+										<p id="cart-total-cost"></p> <!-- From JS -->
+										<hr>
+										<input id="payment-modal-button" type="button" class="btn btn-outline-primary btn-lg" type="button" value="Seleccionar forma de pago">
+									</div> 
+								</div>
+
+								<!-- Payment Information Modal -->
+								<div class="modal fade" id="payment-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modal-label" aria-hidden="true">
+									<div class="modal-dialog">
+										<div class="modal-content">
+											<div class="modal-header">
+												<h5 class="modal-title" id="modal-label">Forma de pago</h5>
+												<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+											</div>
+											<div class="modal-body">
+												<!-- Tabs -->
+												<ul class="nav nav-tabs">
+													<li class="nav-item">
+														<label class="nav-link" for="payment-radio-card">
+															<input class="d-none" type="radio" id="payment-radio-card" name="payment-method" checked>
+															Tarjeta de crédito
+														</label>
+													</li>
+													<li class="nav-item">
+														<label class="nav-link">
+															<input class="d-none" type="radio" id="payment-radio-bank" name="payment-method">
+															Transferencia bancaria
+														</label>
+													</li>
+												</ul>
+												<!-- Data inputs -->
+												<div class="needs-validation" id="card-data-container">
+													<label class="form-label" for="card-data-num">Número de tarjeta</label><br>
+													<input class="form-control form-control-lg" type="text" id="card-data-num" name="card-data" pattern="[0-9]{1,16}" required>
+													<div class="invalid-feedback">Ingresa número de tarjeta válido</div><br>
+													<label class="form-label" for="card-data-seq-num">Código de seguridad</label><br>
+													<input class="form-control form-control-lg" type="text" id="card-data-seq-num" name="card-data" pattern="[0-9]{1,3}" required>
+													<div class="invalid-feedback">Ingresa código de seguridad válido</div><br>
+													<label class="form-label" for="card-data-exp">Vencimiento (MM/AA)</label><br>
+													<input class="form-control form-control-lg" type="text" id="card-data-exp" name="card-data" pattern="[0-9]{1,4}" required>
+													<div class="invalid-feedback">Ingresa una fecha de vencimiento válida (MM/AA)</div>
+												</div>
+												<div id="bank-data-container">
+													<label class="form-label" for="bank-data-account">Número de cuenta</label><br>
+													<input class="form-control form-control-lg" type="text" id="bank-data-account" name="bank-data" pattern="[0-9]{1,14}" required>
+													<div class="invalid-feedback">Ingresa un número de cuenta válido</div>
+												</div>
+											</div>
+											<div class="modal-footer">
+												<button type="button" id="cart-pay-btn" class="btn btn-primary"></button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
   </main>
@@ -38,6 +140,7 @@
       <div></div>
     </div>
   </div>
+  <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
   <script src="js/bootstrap.bundle.min.js"></script>
   <script src="js/init.js"></script>
   <script src="js/nav.js"></script>

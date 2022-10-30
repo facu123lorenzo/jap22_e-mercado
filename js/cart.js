@@ -1,7 +1,11 @@
 let exchangeRates = null;
+let subTotalCost = 0;
+let shippingCost = 0;
+
+
 
 function setProductCount(prodId, val){
-	if(!prodId || val < 0) return;
+	if(!prodId || val < 1) return;
 
 	let username = localStorage.getItem("loggedEmail");
 	let cart = getCart(username);
@@ -12,7 +16,8 @@ function setProductCount(prodId, val){
 	
 	cart[index].count = val;
 	setCart(username, cart);
-	document.getElementById("cart-section").innerHTML = createCartSection(getCart(localStorage.getItem("loggedEmail")));
+	document.getElementById("cart-section").innerHTML = createCartSection();
+	updateCost();
 }
 
 function removeFromCart(prodId){
@@ -21,24 +26,36 @@ function removeFromCart(prodId){
 	index = cart.findIndex(prod => (prod.id == prodId));
 	if(index < 0) return;
 
+	cart.splice(index, 1);
 	setCart(localStorage.getItem("loggedEmail"), cart);
-	document.getElementById("cart-section").innerHTML = createCartSection(getCart(localStorage.getItem("loggedEmail")));
+	document.getElementById("cart-section").innerHTML = createCartSection();
+	updateCost();
 }
 
-function createCartSection(products){
-	let html = "";
-	let totalCost = 0;
-	let cartItems = "";
+function clearCart(){
+	localStorage.removeItem("cart-"+localStorage.getItem("loggedEmail"));
+}
 
-	// Convert currencies to local if not in UYU
-	for(let product of products){
+function createCartSection(){
+	let cartItems = "";
+	let html = "";
+	// Get current cart
+	let products = getCart(localStorage.getItem("loggedEmail"));
+
+	// Convert UYU to USD
+	subTotalCost = 0;
+	for(let i = 0; i<products.length; i++){
+		let product = products[i];
 		let productCost = product.unitCost*product.count;
-		if(product.currency != "UYU") productCost *= exchangeRates[product.currency].sell;
-		totalCost += productCost;
+		if(product.currency == "UYU"){
+			productCost /= exchangeRates.USD.sell;
+		}
+		subTotalCost += productCost;
 	}
 	// If cart is empty create an alert and return
 	if(!products || products.length <= 0){
-		html = `
+		let checkoutPageElement = document.getElementById("checkout-page");
+		checkoutPageElement.innerHTML = `
 			<div class="mt-5 card w-100 text-center ">
 				<div class="container p-4">
 					<div id="alertBox" class="row " role="alert">
@@ -48,13 +65,23 @@ function createCartSection(products){
 				</div>
 			</div>
 		`
-		return html;
+		return;
 	}
 
-	// Create a row for each cart item
+	// Create a row for each cart item and calc costs
+	subTotalCost = 0;
 	for(let i = 0; i<products.length; i++){
 		let prod = products[i];
-		cartItems +=`
+
+		//Convert prices to USD for use in SubTotal and Total;
+		let productCost = prod.unitCost*prod.count;
+		if(prod.currency == "UYU"){
+			productCost /= exchangeRates.USD.sell;
+		}
+		subTotalCost += productCost;
+
+		// Create cart item
+		html +=`
 			<div class="rounded-3 mb-4">
 				<div class="card-body p-4">
 					<div class="row d-flex justify-content-between align-items-center">
@@ -87,49 +114,135 @@ function createCartSection(products){
 			</div>
 		`
 	}
-
-	// Full section body, cart items are inserted here
-	html = `
-		<div class="container h-100 py-5">
-			<div class="row d-flex justify-content-center align-items-center h-100">
-				<div class="col-10">
-					<div class="d-flex justify-content-between align-items-center mb-4">
-						<h3 class="fw-normal mb-0 w-100 text-black text-center">Tu carrito</h3>
-					</div>
-					${cartItems}
-					<div class="d-flex justify-content-between align-items-center mb-4">
-						<h3 class="fw-normal mb-0 w-100 text-black text-center">Datos de envío</h3>
-					</div>
-					<div class="card mb-4">
-						<div class="card-body p-4">
-							<form action="#">
-								<div class="form-outline">
-									<h4>Tipo de envío</h4>
-										<label class="form-label"><input class="mx-2" type="radio" name="shipping-type">Premium 2 a 5 días (15%)</label><br>
-										<label class="form-label"><input class="mx-2" type="radio" name="shipping-type">Express 5 a 8 días (7%)</label><br>
-										<label class="form-label"><input class="mx-2" type="radio" name="shipping-type">Standard 12 a 15 días (5%)</label><br>
-								</div>
-								<div class="form-outline row">
-									<h4>Dirección de envío</h4>
-										<label class="form-label">Calle<br><input class="form-control form-control-lg" type="text"></label>
-										<label class="form-label">Número<br><input class="form-control form-control-lg" type="text"></label>
-										<label class="form-label">Esquina<br><input class="form-control form-control-lg" type="text"></label>
-									<div class="text-center">
-										<input class="btn btn-outline-primary btn-lg" type="submit" value="Finalizar compra\n${formatCurrency(totalCost, 'UYU')}">
-									</div>
-								</div>
-							</form>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	`
 	return html;
 }
 
-document.addEventListener("DOMContentLoaded", async () => {
+function updateCost(){
+	let form = document.getElementById("cart-form");
+	let subTotalCostElement = document.getElementById("cart-subtotal");
+	let shippingCostElement = document.getElementById("cart-shipping-cost");
+	let totalCostElement = document.getElementById("cart-total-cost");
+	let totalCostBtn = document.getElementById("cart-pay-btn");
+	// Calc shipping cost
+	shippingCost = 0;
+	for(radio of form.shipping){
+		if(radio.checked){
+			shippingCost = subTotalCost * parseFloat(radio.getAttribute("data-value"));
+			subTotalCostElement.innerHTML = "Sub total: "+ formatCurrency(subTotalCost, "USD");
+			shippingCostElement.innerHTML = "Envío: "+ formatCurrency(shippingCost, "USD");
+			totalCostBtn.innerHTML = "Confirmar compra<br>Total: "+formatCurrency(subTotalCost+shippingCost, "USD");
+			totalCostElement.innerHTML = "<b>Total: "+formatCurrency(subTotalCost+shippingCost, "USD")+"</b>";
+			break;
+		}
+	}
+}
+function setInputsState(inputs, state){
+	for(element of inputs){
+		if(element.localName == "input"){
+			element.disabled = !state;
+		}
+	}
+}
 
+function setRequired(elements, bool){
+	for(let element of elements){
+		element.required = bool;
+	}
+}
+
+function updatePaymentModal(){
+	let cardTab = document.getElementById("payment-radio-card");
+	let bankTab = document.getElementById("payment-radio-bank");
+	let cardDataContainer = document.getElementById("card-data-container");
+	let bankDataContainer = document.getElementById("bank-data-container");
+	if(cardTab.checked){
+		setInputsState(cardDataContainer.children, true);
+		cardDataContainer.classList.remove("d-none");
+		setInputsState(bankDataContainer.children, false);
+		bankDataContainer.classList.add("d-none");
+		
+	}else if(bankTab.checked){
+		setInputsState(cardDataContainer.children, false);
+		cardDataContainer.classList.add("d-none");
+		setInputsState(bankDataContainer.children, true);
+		bankDataContainer.classList.remove("d-none");
+	}
+}
+
+function validateShippingInfo(form){
+	form.classList.add('was-validated');
+	for(input of form.address){
+		input.classList.remove('is-invalid');
+        input.classList.remove('is-valid');
+		if(!input.checkValidity()){
+			return false;
+		}
+	}
+	return true;
+}
+
+function validatePaymentInfo(form){
+	let cardTab = document.getElementById("payment-radio-card");
+	let inputs = cardTab.checked ? form['card-data'] : [form['bank-data']];
+	
+	setRequired(form['card-data'], false);
+	setRequired([form['bank-data']], false);
+	setRequired(inputs, true);
+	form.classList.add('was-validated');
+	for(input of inputs){
+		input.classList.remove('is-invalid');
+        input.classList.remove('is-valid');
+		if(!input.checkValidity()){
+			return false;
+		}
+	}
+	return true;
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+	let formElement = document.getElementById("cart-form");
 	exchangeRates = await getJSONData(BROUEXCHANGE_URL).then(json => json.data.rates);
-	document.getElementById("cart-section").innerHTML = createCartSection(getCart(localStorage.getItem("loggedEmail")));
+	document.getElementById("cart-section").innerHTML = createCartSection();
+	updateCost();
+	updatePaymentModal();
+	formElement.addEventListener("change", () =>{
+		updateCost();
+		updatePaymentModal();
+	});
+
+	// Modal functionality
+	document.getElementById("payment-modal-button").addEventListener("click", ()=>{
+		let modal = $("#payment-modal");
+		if(validateShippingInfo(formElement)){
+			modal.modal('toggle');
+			formElement.classList.remove("was-validated");
+		}
+	});
+
+	document.getElementById("cart-pay-btn").addEventListener("click", (e) =>{
+		if(validatePaymentInfo(formElement)){
+			let checkoutPageElement = document.getElementById("checkout-page");
+			let modal = $("#payment-modal");
+			modal.modal("hide");
+			clearCart();
+			checkoutPageElement.innerHTML = `
+				<div class="mt-5 card w-100 text-center">
+					<div class="container p-4">
+						<div id="alertBox" class="row" role="alert">
+							<h3>¡Felicidades, tu compra se ha completado con éxito!</p3>
+						</div>
+						<a class="btn btn-primary mx-3 mt-4" href="./main.html">Volver al inicio</a>
+					</div>
+				</div>
+			`
+		}
+	});
+
+	let cardTab = document.getElementById("payment-radio-card").addEventListener("change", () => {
+		formElement.classList.remove("was-validated");
+	});
+
+	let bankTab = document.getElementById("payment-radio-bank").addEventListener("change", () => {
+		formElement.classList.remove("was-validated");
+	});
 });

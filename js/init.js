@@ -50,9 +50,10 @@ let getJSONData = async function(url){
 }
 
 function formatCurrency(cost, currency){
-	let str = currency+" ";
+	//let str = currency+" ";
+	let str = "$";
 	if(currency == 'USD'){
-		str += Number(cost).toLocaleString('en');
+		str = "USD " + Number(cost).toLocaleString('en');
 	}else{
 		str += Number(cost).toLocaleString('uy');
 	}
@@ -75,7 +76,7 @@ function formatCurrency(cost, currency){
 			return;
 		}
 
-		// Skip when the fetched article is already in the storage
+		// Skip when the fetched article is already in storage
 		let article = null;
 		article = localArticles.find(function(art){
 			return art.id == json.articles[0].id;
@@ -103,7 +104,12 @@ function logout(){
 }
 
 function getCart(username){
-	return JSON.parse(localStorage.getItem("cart-"+username));
+	let cart = JSON.parse(localStorage.getItem("cart-"+username));
+	if(!cart){
+		cart = [];
+		setCart(username, cart);
+	}
+	return cart;
 }
 
 function setCart(username, productsJSON){
