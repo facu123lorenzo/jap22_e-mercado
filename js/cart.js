@@ -1,8 +1,6 @@
 let exchangeRates = null;
 let subTotalCost = 0;
-let shippingCost = 0;
-
-
+/* let shippingCost = 0; */
 
 function setProductCount(prodId, val){
 	if(!prodId || val < 1) return;
@@ -37,7 +35,6 @@ function clearCart(){
 }
 
 function createCartSection(){
-	let cartItems = "";
 	let html = "";
 	// Get current cart
 	let products = getCart(localStorage.getItem("loggedEmail"));
@@ -123,8 +120,9 @@ function updateCost(){
 	let shippingCostElement = document.getElementById("cart-shipping-cost");
 	let totalCostElement = document.getElementById("cart-total-cost");
 	let totalCostBtn = document.getElementById("cart-pay-btn");
-	// Calc shipping cost
-	shippingCost = 0;
+	
+	// Calc costs
+	let shippingCost = 0;
 	for(radio of form.shipping){
 		if(radio.checked){
 			shippingCost = subTotalCost * parseFloat(radio.getAttribute("data-value"));
@@ -136,25 +134,13 @@ function updateCost(){
 		}
 	}
 }
-function setInputsState(inputs, state){
-	for(element of inputs){
-		if(element.localName == "input"){
-			element.disabled = !state;
-		}
-	}
-}
-
-function setRequired(elements, bool){
-	for(let element of elements){
-		element.required = bool;
-	}
-}
 
 function updatePaymentModal(){
 	let cardTab = document.getElementById("payment-radio-card");
 	let bankTab = document.getElementById("payment-radio-bank");
 	let cardDataContainer = document.getElementById("card-data-container");
 	let bankDataContainer = document.getElementById("bank-data-container");
+	
 	if(cardTab.checked){
 		setInputsState(cardDataContainer.children, true);
 		cardDataContainer.classList.remove("d-none");
@@ -166,6 +152,20 @@ function updatePaymentModal(){
 		cardDataContainer.classList.add("d-none");
 		setInputsState(bankDataContainer.children, true);
 		bankDataContainer.classList.remove("d-none");
+	}
+}
+
+function setInputsState(inputs, state){
+	for(element of inputs){
+		if(element.localName == "input"){
+			element.disabled = !state;
+		}
+	}
+}
+
+function setRequired(elements, bool){
+	for(let element of elements){
+		element.required = bool;
 	}
 }
 

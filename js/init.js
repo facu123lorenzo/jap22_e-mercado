@@ -96,6 +96,7 @@ async function login(username){
 	localStorage.setItem("loggedEmail", username);
 	await fetchUserCart();
 	window.location.href = "./main.html";
+
 }
 
 function logout(){

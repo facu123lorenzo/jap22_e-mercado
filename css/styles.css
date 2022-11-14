@@ -195,3 +195,9 @@ a.custom-card:hover {
 .checked {
   color: orange;
 }
+
+.form-control.no-validate:valid {
+    border-color: #ced4da;
+    padding-right: .75rem;
+    background: none;
+}

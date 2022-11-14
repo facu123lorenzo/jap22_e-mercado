@@ -1,6 +1,25 @@
 document.addEventListener("DOMContentLoaded", event =>{
 	let navBar = document.createElement("nav");
 
+	let profileBtn = "";
+	let username = localStorage.getItem("loggedEmail");
+	
+	if(username){
+		profileBtn = `
+			<a class="nav-link dropdown-toggle" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+				<i class="far fa-user fa-2xs mx-1"></i>
+				${username}
+			</a>
+		`
+	}
+	else{
+		profileBtn = `
+			<li class="nav-item">
+				<a class="nav-link" href="index.html">Iniciar Sesión</a>
+			</li>
+		`
+	}
+
 	navBar.classList = "navbar navbar-expand-lg navbar-dark bg-dark p-1";
 	navBar.innerHTML = `
 		<div class="container">
@@ -20,13 +39,10 @@ document.addEventListener("DOMContentLoaded", event =>{
 					</li>
 					<li>
 						<li class="nav-item dropdown">
-							<a class="nav-link dropdown-toggle" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-								<i class="far fa-user fa-2xs mx-1"></i>
-								${localStorage.getItem("loggedEmail")}
-							</a>
+							${profileBtn}
 							<ul class="dropdown-menu dropdown-menu-dark bg-dark" aria-labelledby="navbarDarkDropdownMenuLink">
 								<li><a class="nav-link" href="cart.html">Mi Carrito</a>
-								<li><a class="nav-link" href="my-profile.html">Mi perfil</a></li>
+								<li><a class="nav-link" href="my-profile.html">Mi perfil</a></li>								
 								<li><a class="nav-link" href="#" onclick="logout()">Cerrar sesión</a></li>
 							</ul>
 						</li>
